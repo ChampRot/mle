@@ -1,6 +1,7 @@
 import random
 from math import exp
 
+import matplotlib.pyplot as pyplot
 
 def random_bits(len):
     """Returns a list containing a random combination
@@ -89,11 +90,12 @@ def evolution(p, r, m, run_ct, gene_length, short_fittness_function):
     """Try and find some good genes"""
     
     population = init_population(p, gene_length)
+    stats = []
     for i in range(run_ct):
         p_function = create_probability_function(population, short_fittness_function)
         
-        #next_gen = selection(population, round((1 - r) * p), p_function)
-        next_gen = select_fittest(population, round((1 - r) * p), short_fittness_function)
+        next_gen = selection(population, round((1 - r) * p), p_function)
+        # next_gen = select_fittest(population, round((1 - r) * p), short_fittness_function)
 
         parents = selection(population, round(r * p), p_function)
         for j in range(1, len(parents), 2):
@@ -114,13 +116,16 @@ def evolution(p, r, m, run_ct, gene_length, short_fittness_function):
             if short_fittness_function(gene) > fittest:
               fittest = short_fittness_function(gene) 
               best_gene = gene
+        stats.append(fittest)
         print(fittest)
-    return (fittest, gene)
+    return (fittest, best_gene, stats)
 
+
+c = 0.01
 
 volumes = gen_volumes(100, 10)
-r = evolution(10, 0.4, 0.3, 50, 100, lambda gene : calculate_fitness(gene, volumes, 0.001))
-print(r[0])
+r = evolution(10, 0.4, 0.3, 50, 100, lambda gene : calculate_fitness(gene, volumes, c))
 print(calculate_volume(r[1], volumes))
 
-# print(select_fittest(init_population(10, 10), 4, lambda gene : calculate_fitness(gene, volumes, 0.0001)))
+pyplot.plot(list(range(50)), r[2], )
+pyplot.show()
